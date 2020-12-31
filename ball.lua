@@ -21,6 +21,13 @@ function Ball:update(dt)
 end
 
 function Ball:collide()
+    self:collideWall()
+    self:collidePlayer()
+    self:collideAI()
+    self:score()
+end
+
+function Ball:collidePlayer()
     if checkCollision(self, Player) then
         -- Define when ball and player collide
         self.xVel = self.speed
@@ -30,7 +37,9 @@ function Ball:collide()
         local collisionPosition = middleBall - middlePlayer
         self.yVel = collisionPosition * 5 --Angle change
     end
+end
 
+function Ball:collideAI()    
     -- Collision for AI
     if checkCollision(self, AI) then
             -- Define when ball and AI collide and the ball comes back to Player
@@ -41,9 +50,10 @@ function Ball:collide()
             local collisionPosition = middleBall - middleAI
             self.yVel = collisionPosition * 5 --Angle change
         end
+end
 
+function Ball:collideWall()
     -- Prevent Ball from leaving area
-
     if self.y < 0 then
         self.y = 0
         -- This switch in velocity sends the ball back
@@ -53,29 +63,29 @@ function Ball:collide()
         self.y = love.graphics.getHeight() - self.height
         self.yVel = -self.yVel
     end
-
-    -- Check if wall is hit and reset ball position (Player Point)
-    if self.x <0 then
-        self.x = love.graphics.getWidth() / 2 - self.width / 2
-        self.y = love.graphics.getHeight() / 2 - self.height / 2
-        self.yVel = 0
-        self.xVel = self.speed
-        -- Sends ball to AI now
-    end
-
-        -- Check if wall is hit and reset ball position (AI Point)
-        if self.x + self.width > love.graphics.getWidth() then
-            self.x = love.graphics.getWidth() / 2 - self.width / 2
-            self.y = love.graphics.getHeight() / 2 - self.height / 2
-            self.yVel = 0
-            self.xVel = -self.speed
-            -- Sends ball to Player now
-        end
-
 end
 
+function Ball:score()
+     -- Check if wall is hit and reset ball position (AI Point)
+    if self.x <0 then
+        self:resetPosition(1)
+        Score.ai = Score.ai + 1
+    end
 
+        -- Check if wall is hit and reset ball position (Player Point)
+    if self.x + self.width > love.graphics.getWidth() then
+        self:resetPosition(-1)
+        Score.player = Score.player + 1
+    end
+end
 
+-- Resets ball if it hits wall
+function Ball:resetPosition(modifier)
+    self.x = love.graphics.getWidth() / 2 - self.width / 2
+    self.y = love.graphics.getHeight() / 2 - self.height / 2
+    self.yVel = 0
+    self.xVel = -self.speed * modifier
+end
 
 --Change ball position based on velocity
 function Ball:move(dt)

@@ -11,6 +11,10 @@ function love.load()
     Player:load()    
     Ball:load()
     AI:load()
+
+    -- Set intial score
+    Score = {player = 0, ai = 0}
+    font = love.graphics.newFont(30)
 end
 
 -- Game Logic that will need to update and trigger 1 time per frame
@@ -20,11 +24,19 @@ function love.update(dt)
     AI:update(dt)
 end
 
--- Display graphics on screen
+-- Display graphics on screen & score (and coordinates)
 function love.draw()
     Player:draw()
     Ball:draw()
     AI:draw()
+    drawScore()
+end
+
+-- Font of score and score details
+function drawScore()
+    love.graphics.setFont(font)
+    love.graphics.print("Player: "..Score.player, 50, 50)
+    love.graphics.print("AI: "..Score.ai, 1000, 50)
 end
 
 -- See if there is a collision
